@@ -1,9 +1,9 @@
 import 'package:get/instance_manager.dart';
-import 'package:nittfest/controllers/inductions_controller.dart';
+import 'package:nittfest/controllers/home_controller.dart';
 
-class InductionsBindings extends Bindings {
+class HomeBindings extends Bindings {
   @override
   void dependencies() {
-    Get.put(InductionsController());
+    Get.put(HomeController());
   }
 }

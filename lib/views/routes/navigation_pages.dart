@@ -17,7 +17,7 @@ class NavigationPages {
         GetPage(
           name: NavigationRoutes.inductionsHomeRoute,
           page: () => const HomePage(),
-          binding: InductionsBindings(),
+          binding: HomeBindings(),
         ),
         GetPage(
           name: NavigationRoutes.inductionsFormsRoute,

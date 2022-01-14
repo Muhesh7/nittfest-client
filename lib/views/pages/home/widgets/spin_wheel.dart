@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
-import 'package:nittfest/controllers/inductions_controller.dart';
+import 'package:nittfest/controllers/home_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nittfest/views/themes/app_themes.dart';
 import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
@@ -42,7 +42,7 @@ class SpinWheel extends StatelessWidget {
         'icon': Icons.architecture_rounded
       }
     ];
-    var controller = Get.find<InductionsController>();
+    var controller = Get.find<HomeController>();
     Size size = MediaQuery.of(context).size;
     return MouseRegion(
         onEnter: (event) => controller.isHovered2.value = 5,
