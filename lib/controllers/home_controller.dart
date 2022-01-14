@@ -1,5 +1,5 @@
-import 'dart:developer';
-
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nittfest/models/team_data_model.dart';
@@ -10,6 +10,10 @@ class HomeController extends GetxController {
   late RiveAnimationController flyingcarController;
   var isHovered = false.obs;
   var isHovered2 = 0.obs;
+  var currentPointer = const Offset(0, 0);
+  var center = const Offset(0, 0);
+  var startAngle = 0.0.obs;
+  var choosenTeam = 'A/V';
   Stream<int> onRotate = const Stream.empty();
   ImageProvider bg = const AssetImage('bg1.png');
   List<TeamDataModel> data = [
@@ -27,55 +31,54 @@ class HomeController extends GetxController {
     carController = SimpleAnimation('driwing');
     flyingcarController = SimpleAnimation('Animation');
     super.onInit();
-    onRotate.listen((p0) {
-      log(p0.toString());
-    });
+    onRotate.listen((p0) {});
   }
 
-//   _panUpdateHandler(DragUpdateDetails d) {
-//     /// Pan location on the wheel
-//     bool onTop = d.localPosition.dy <= radius;
-//     bool onLeftSide = d.localPosition.dx <= radius;
-//     bool onRightSide = !onLeftSide;
-//     bool onBottom = !onTop;
+  void updateStartAngle(DragUpdateDetails details) {
+    if (center.dx != 0 && center.dy != 0) {
+      currentPointer -= center;
+      var theta = details.delta.distance / currentPointer.distance;
+      var updatedPointer = details.localPosition - center;
+      var direction = currentPointer.dx * updatedPointer.dy -
+          currentPointer.dy * updatedPointer.dx;
+      if (direction > 0) {
+        if (startAngle.value + theta > 2 * pi) {
+          startAngle.value += theta - 2 * pi;
+        } else {
+          startAngle.value += theta;
+        }
+      } else if (direction < 0) {
+        if (startAngle.value - theta < 0) {
+          startAngle.value -= theta - 2 * pi;
+        } else {
+          startAngle.value -= theta;
+        }
+      }
+      currentPointer += center + details.delta;
+    }
+  }
 
-//     /// Pan movements
-//     bool panUp = d.delta.dy <= 0.0;
-//     bool panLeft = d.delta.dx <= 0.0;
-//     bool panRight = !panLeft;
-//     bool panDown = !panUp;
+  void adjust() {
+    int i = 1;
+    for (i = 1; i <= 6; i++) {
+      if (startAngle.value >= ((i - 1) / 6) * 360.0 * pi / 180.0) {
+        if (startAngle.value <= (i / 6) * 360.0 * pi / 180.0) {
+          moveWheel((i / 6) * 360.0 * pi / 180.0);
+          break;
+        }
+      }
+    }
+  }
 
-//     /// Absolute change on axis
-//     double yChange = d.delta.dy.abs();
-//     double xChange = d.delta.dx.abs();
-
-//     /// Directional change on wheel
-//     double verticalRotation = (onRightSide && panDown) || (onLeftSide && panUp)
-//         ? yChange
-//         : yChange * -1;
-
-//     double horizontalRotation =
-//         (onTop && panRight) || (onBottom && panLeft) ? xChange : xChange * -1;
-
-// // Total computed change
-//     double rotationalChange = verticalRotation + horizontalRotation;
-
-//     double _value = degree + (rotationalChange / 5);
-
-//     setState(() {
-//       degree = _value > 0 ? _value : 0;
-//       ctrl.value = degree;
-//     });
-//   }
-
-//   _panEndHandler(DragEndDetails d) {
-//     ctrl
-//         .animateTo(roundToBase(degree.roundToDouble(), 10),
-//             duration: Duration(milliseconds: 551), curve: Curves.easeOutBack)
-//         .whenComplete(() {
-//       setState(() {
-//         degree = roundToBase(degree.roundToDouble(), 10);
-//       });
-//     });
-//   }
+  void moveWheel(double finishAngle) {
+    Timer.periodic(const Duration(milliseconds: 10), (timer) {
+      startAngle.value += 0.01;
+      if (startAngle > finishAngle) {
+        timer.cancel();
+        if (startAngle.value >= 2 * pi) {
+          startAngle.value = 0;
+        }
+      }
+    });
+  }
 }
